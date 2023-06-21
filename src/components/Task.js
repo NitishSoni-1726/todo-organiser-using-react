@@ -38,6 +38,7 @@ export default function TaskList(props) {
               editButtonRef
             );
           }}
+          checked={props.task.status === "completed"}
         ></input>
         <div
           className="flex-grow-1 ms-3 me-2 p-1"

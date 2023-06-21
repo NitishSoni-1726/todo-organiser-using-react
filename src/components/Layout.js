@@ -1,60 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddTask from "./AddTask";
 import Task from "./Task";
 import Search from "./Search";
 
 export default function Layout() {
   const [searchStr, setSearchStr] = useState("");
+  const [completeFilter, setCompleteFilter] = useState(false);
+  const [remainingFilter, setRemainingFilter] = useState(false);
   const [taskList, setTaskList] = useState([]);
-  const [completedTaskCount, setcompletedTaskCount] = useState(0);
-  const [remainingTaskCount, setremainingTaskCount] = useState(0);
 
   function handleAddTask(newTaskContent) {
-    const date = new Date();
-    let currentDay = String(date.getDate()).padStart(2, "0");
-    let currentMonth = String(date.getMonth() + 1).padStart(2, "0");
-    let currentYear = date.getFullYear();
-    let currentDate = currentYear + "-" + currentMonth + "-" + currentDay;
     let newTask = {
       content: newTaskContent,
       status: "not_completed",
-      date_created: currentDate,
+      date_created: new Date().getTime(),
     };
     setTaskList(taskList.concat(newTask));
-    updateTaskCount(taskList.concat(newTask));
   }
   function handleDelete(index) {
     let newTaskList = [];
     for (let i = 0; i < taskList.length; i++) {
-      if (i === index) {
-      } else {
+      if (i !== index) {
         newTaskList.push(taskList[i]);
       }
     }
     setTaskList(newTaskList);
-    updateTaskCount(newTaskList);
   }
   function handleSave(value, index) {
     taskList[index].content = value;
     setTaskList([...taskList]);
-  }
-  function updateTaskCount(array) {
-    if (array.length === 0) {
-      setcompletedTaskCount(0);
-      setremainingTaskCount(0);
-    } else {
-      let completedArray = [];
-      let remainingArray = [];
-      for (let i = 0; i < array.length; i++) {
-        if (array[i].status === "completed") {
-          completedArray.push(array[i]);
-        } else if (array[i].status === "not_completed") {
-          remainingArray.push(array[i]);
-        }
-        setcompletedTaskCount(completedArray.length);
-        setremainingTaskCount(remainingArray.length);
-      }
-    }
   }
   function handleStatusChange(checked, index) {
     if (checked) {
@@ -68,15 +42,60 @@ export default function Layout() {
     setSearchStr(searchStr.trim());
   }
 
+  function handleFilterCompleted() {
+    setCompleteFilter(true);
+    setRemainingFilter(false);
+  }
+  function handleFilterRemaining() {
+    setRemainingFilter(true);
+    setCompleteFilter(false);
+  }
+  function handleShowAllTask() {
+    setRemainingFilter(false);
+    setCompleteFilter(false);
+  }
+
   let filteredTasks = taskList;
   // Derived state. Don't need to store it in state using useState.
-  if (searchStr) {
-    filteredTasks = [];
 
+  if (completeFilter) {
+    filteredTasks = [];
     for (let i = 0; i < taskList.length; i++) {
-      if (taskList[i].content.toLowerCase().includes(searchStr.toLowerCase())) {
+      if (taskList[i].status === "completed") {
         filteredTasks.push(taskList[i]);
       }
+    }
+  }
+  if (remainingFilter) {
+    filteredTasks = [];
+    for (let i = 0; i < taskList.length; i++) {
+      if (taskList[i].status === "not_completed") {
+        filteredTasks.push(taskList[i]);
+      }
+    }
+  }
+  if (searchStr) {
+    const filteredTasksTemp = [...filteredTasks];
+    filteredTasks = [];
+    for (let i = 0; i < filteredTasksTemp.length; i++) {
+      if (
+        filteredTasksTemp[i].content
+          .toLowerCase()
+          .includes(searchStr.toLowerCase())
+      ) {
+        filteredTasks.push(filteredTasksTemp[i]);
+      }
+    }
+  }
+  const taskCount = filteredTasks.length;
+  let completedTaskCount = filteredTasks.filter(
+    (task) => task.status === "completed"
+  ).length;
+  let remainingTaskCount = 0;
+
+  for (let i = 0; i < filteredTasks.length; i++) {
+    if (filteredTasks[i].status === "not_completed") {
+      remainingTaskCount++;
     }
   }
 
@@ -108,22 +127,24 @@ export default function Layout() {
             })}
           </div>
           <div className="mt-3 d-flex justify-content-between w-100">
-            {/* <button
+            <button
               className="btn btn-warning"
               style={{ fontWeight: "700", fontSize: "14px" }}
-              onClick={handleTotalTask}
+              onClick={handleShowAllTask}
             >
-              Task Count: {taskList.length}
-            </button> */}
+              Task Count: {taskCount}
+            </button>
             <button
               className="btn btn-success"
               style={{ fontWeight: "700", fontSize: "14px" }}
+              onClick={handleFilterCompleted}
             >
               Completed Task: {completedTaskCount}
             </button>
             <button
               className="btn btn-danger"
               style={{ fontWeight: "700", fontSize: "14px" }}
+              onClick={handleFilterRemaining}
             >
               Remaining Task: {remainingTaskCount}
             </button>

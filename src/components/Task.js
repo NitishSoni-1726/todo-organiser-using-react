@@ -1,16 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 export default function TaskList(props) {
   const checkRef = React.createRef();
   const taskRef = React.createRef();
   const saveButtonRef = React.createRef();
   const editButtonRef = React.createRef();
-  useEffect(() => {
-    if (props.task.status === "completed") {
-      checkRef.current.checked = "true";
-      taskRef.current.style.textDecoration = "line-through";
-      editButtonRef.current.disabled = true;
+  const [taskState, setTaskState] = useState("read");
+
+  function handleEditClick() {
+    // TODO
+    setTaskState("edit");
+  }
+
+  function handleSaveClick() {
+    setTaskState("read");
+    props.onSave(taskRef.current.innerText, props.index);
+  }
+
+  function handleEnterKeyboardClick(e) {
+    if (e.key === "Enter") {
+      handleSaveClick();
     }
-  });
+  }
+
   return (
     <div className="align-self-start w-100 mt-3">
       <div className="d-flex align-items-center w-100">
@@ -18,42 +29,49 @@ export default function TaskList(props) {
           type="checkbox"
           style={{ transform: "scale(1.5)" }}
           ref={checkRef}
+          id="check-box"
           onChange={() => {
-            props.onStatusChange(checkRef, props.index, taskRef, editButtonRef);
+            props.onStatusChange(
+              checkRef.current.checked,
+              props.index,
+              taskRef,
+              editButtonRef
+            );
           }}
         ></input>
         <div
           className="flex-grow-1 ms-3 me-2 p-1"
-          style={{ fontSize: "20px" }}
+          style={{
+            fontSize: "20px",
+            textDecoration:
+              props.task.status === "completed" ? "line-through" : "none",
+            background: taskState === "edit" ? "white" : "transparent",
+            color: taskState === "edit" ? "black" : "white",
+          }}
           ref={taskRef}
+          contentEditable={taskState === "edit"}
+          onKeyDown={handleEnterKeyboardClick}
         >
           {props.task.content}
         </div>
-
-        <button
-          className="btn btn-warning me-1"
-          onClick={() => {
-            saveButtonRef.current.style.display = "block";
-            editButtonRef.current.style.display = "none";
-            props.onEditClick(taskRef);
-          }}
-          ref={editButtonRef}
-        >
-          <i className="fa fa-edit"></i>
-        </button>
-
-        <button
-          className="btn btn-success me-1"
-          style={{ display: "none" }}
-          onClick={() => {
-            saveButtonRef.current.style.display = "none";
-            editButtonRef.current.style.display = "block";
-            props.onSaveClick(taskRef, props.index);
-          }}
-          ref={saveButtonRef}
-        >
-          <i className="fa fa-save"></i>
-        </button>
+        {taskState === "read" ? (
+          <button
+            className="btn btn-warning me-1"
+            disabled={props.task.status === "completed"}
+            ref={editButtonRef}
+            onClick={handleEditClick}
+          >
+            <i className="fa fa-edit"></i>
+          </button>
+        ) : (
+          <button
+            className="btn btn-success me-1"
+            ref={saveButtonRef}
+            onClick={handleSaveClick}
+          >
+            <i className="fa fa-save"></i>
+          </button>
+        )}
 
         <button
           className="btn btn-danger"

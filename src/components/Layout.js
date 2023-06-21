@@ -39,6 +39,10 @@ export default function Layout() {
     updateTaskCount(newTaskList);
     setSearchDuplicate(newTaskList);
   }
+  function handleSave(value, index) {
+    taskList[index].content = value;
+    setTaskList([...taskList]);
+  }
   function updateTaskCount(array) {
     if (array.length === 0) {
       setcompletedTaskCount(0);
@@ -57,28 +61,13 @@ export default function Layout() {
       }
     }
   }
-  function handleStatusChange(checkref, index, taskref, editButtonRef) {
-    if (checkref.current.checked) {
+  function handleStatusChange(checked, index) {
+    if (checked) {
       taskList[index].status = "completed";
-      taskref.current.style.textDecoration = "line-through";
-      editButtonRef.current.disabled = true;
     } else {
       taskList[index].status = "not_completed";
-      taskref.current.style.textDecoration = "none";
-      editButtonRef.current.disabled = false;
     }
-    updateTaskCount(taskList);
-  }
-  function handleEdit(taskref) {
-    taskref.current.contentEditable = "true";
-    taskref.current.style.background = "white";
-    taskref.current.style.color = "black";
-  }
-  function handleSave(taskref, index) {
-    taskref.current.contentEditable = "false";
-    taskref.current.style.background = "transparent";
-    taskref.current.style.color = "white";
-    taskList[index].content = taskref.current.innerText;
+    setTaskList([...taskList]);
   }
   function handleSearch(searchRef) {
     let searchedArray = [];
@@ -159,28 +148,28 @@ export default function Layout() {
             className="w-100 taskl-list mt-2"
             style={{ height: "50vh", overflowY: "scroll", overflowX: "hidden" }}
           >
-            {duplicateTaskList.map((task, i) => {
+            {taskList.map((task, i) => {
               return (
                 <Task
                   key={task.content}
                   index={i}
                   task={task}
                   onDelete={() => handleDelete(i)}
+                  onSave={handleSave}
                   onStatusChange={handleStatusChange}
-                  onEditClick={handleEdit}
                   onSaveClick={handleSave}
                 />
               );
             })}
           </div>
           <div className="mt-3 d-flex justify-content-between w-100">
-            <button
+            {/* <button
               className="btn btn-warning"
               style={{ fontWeight: "700", fontSize: "14px" }}
               onClick={handleTotalTask}
             >
               Task Count: {taskList.length}
-            </button>
+            </button> */}
             <button
               className="btn btn-success"
               style={{ fontWeight: "700", fontSize: "14px" }}

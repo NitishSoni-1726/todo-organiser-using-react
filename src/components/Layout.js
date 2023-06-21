@@ -4,10 +4,8 @@ import Task from "./Task";
 import Search from "./Search";
 
 export default function Layout() {
-  const dateRef = React.createRef();
+  const [searchStr, setSearchStr] = useState("");
   const [taskList, setTaskList] = useState([]);
-  const [duplicateTaskList, setDuplicateTaskList] = useState([]);
-  const [searchDuplicate, setSearchDuplicate] = useState([]);
   const [completedTaskCount, setcompletedTaskCount] = useState(0);
   const [remainingTaskCount, setremainingTaskCount] = useState(0);
 
@@ -23,7 +21,6 @@ export default function Layout() {
       date_created: currentDate,
     };
     setTaskList(taskList.concat(newTask));
-    setDuplicateTaskList(duplicateTaskList.concat(newTask));
     updateTaskCount(taskList.concat(newTask));
   }
   function handleDelete(index) {
@@ -35,9 +32,7 @@ export default function Layout() {
       }
     }
     setTaskList(newTaskList);
-    setDuplicateTaskList(newTaskList);
     updateTaskCount(newTaskList);
-    setSearchDuplicate(newTaskList);
   }
   function handleSave(value, index) {
     taskList[index].content = value;
@@ -69,64 +64,22 @@ export default function Layout() {
     }
     setTaskList([...taskList]);
   }
-  function handleSearch(searchRef) {
-    let searchedArray = [];
-    if (searchRef.current.value === "") {
-      setDuplicateTaskList(searchDuplicate);
-    } else {
-      for (let i = 0; i < duplicateTaskList.length; i++) {
-        if (
-          searchRef.current.value.toLowerCase() ===
-          duplicateTaskList[i].content.toLowerCase()
-        ) {
-          searchedArray.push(duplicateTaskList[i]);
-          setDuplicateTaskList(searchedArray);
-        }
-      }
-    }
+  function handleSearch(searchStr) {
+    setSearchStr(searchStr.trim());
   }
-  function handleCompletedTask() {
-    let completedArray = [];
+
+  let filteredTasks = taskList;
+  // Derived state. Don't need to store it in state using useState.
+  if (searchStr) {
+    filteredTasks = [];
+
     for (let i = 0; i < taskList.length; i++) {
-      if (taskList[i].status === "completed") {
-        completedArray.push(taskList[i]);
-      }
-      setDuplicateTaskList(completedArray);
-      setSearchDuplicate(completedArray);
-    }
-  }
-  function handleRemainingTask() {
-    let remainingArray = [];
-    for (let i = 0; i < taskList.length; i++) {
-      if (taskList[i].status === "not_completed") {
-        remainingArray.push(taskList[i]);
-      }
-      setDuplicateTaskList(remainingArray);
-      setSearchDuplicate(remainingArray);
-    }
-  }
-  function handleTotalTask() {
-    setDuplicateTaskList(taskList);
-    setSearchDuplicate(taskList);
-  }
-  function handleDateSort() {
-    let dateSortedArray = [];
-    if (dateRef.current.value === "") {
-      setDuplicateTaskList(taskList);
-      setSearchDuplicate(taskList);
-    } else {
-      for (let i = 0; i < taskList.length; i++) {
-        if (dateRef.current.value === taskList[i].date_created) {
-          dateSortedArray.push(taskList[i]);
-          setDuplicateTaskList(dateSortedArray);
-          setSearchDuplicate(dateSortedArray);
-        } else {
-          setDuplicateTaskList([]);
-          setSearchDuplicate([]);
-        }
+      if (taskList[i].content.toLowerCase().includes(searchStr.toLowerCase())) {
+        filteredTasks.push(taskList[i]);
       }
     }
   }
+
   return (
     <div>
       <div className="w-100 text-center bg-dark text-light p-3">
@@ -136,19 +89,11 @@ export default function Layout() {
         <div className="d-flex flex-column align-items-center border w-50 p-4 m-4 rounded main-content text-light">
           <AddTask onAddTask={handleAddTask} />
           <Search onSearch={handleSearch} />
-          <div className="align-self-end mt-3 d-flex flex-column">
-            <input
-              type="date"
-              className="btn btn-secondary"
-              ref={dateRef}
-              onChange={handleDateSort}
-            ></input>
-          </div>
           <div
             className="w-100 taskl-list mt-2"
             style={{ height: "50vh", overflowY: "scroll", overflowX: "hidden" }}
           >
-            {taskList.map((task, i) => {
+            {filteredTasks.map((task, i) => {
               return (
                 <Task
                   key={task.content}
@@ -173,14 +118,12 @@ export default function Layout() {
             <button
               className="btn btn-success"
               style={{ fontWeight: "700", fontSize: "14px" }}
-              onClick={handleCompletedTask}
             >
               Completed Task: {completedTaskCount}
             </button>
             <button
               className="btn btn-danger"
               style={{ fontWeight: "700", fontSize: "14px" }}
-              onClick={handleRemainingTask}
             >
               Remaining Task: {remainingTaskCount}
             </button>

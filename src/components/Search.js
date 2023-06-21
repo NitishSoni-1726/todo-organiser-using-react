@@ -9,7 +9,9 @@ export default function Search(props) {
         placeholder="Type to Search..."
         id="search-bar"
         onKeyUp={() => {
-          props.onSearch(searchRef);
+          if (searchRef.current) {
+            props.onSearch(searchRef.current.value);
+          }
         }}
         ref={searchRef}
       ></input>

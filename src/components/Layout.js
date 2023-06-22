@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AddTask from "./AddTask";
 import Task from "./Task";
 import Search from "./Search";
@@ -7,6 +7,8 @@ export default function Layout() {
   const [searchStr, setSearchStr] = useState("");
   const [completeFilter, setCompleteFilter] = useState(false);
   const [remainingFilter, setRemainingFilter] = useState(false);
+  const [ascendingSort, setAscendingSort] = useState(false);
+  const [descendingSort, setDescendingSort] = useState(false);
   const [taskList, setTaskList] = useState([]);
 
   function handleAddTask(newTaskContent) {
@@ -18,13 +20,12 @@ export default function Layout() {
     setTaskList(taskList.concat(newTask));
   }
   function handleDelete(index) {
-    let newTaskList = [];
-    for (let i = 0; i < taskList.length; i++) {
-      if (i !== index) {
-        newTaskList.push(taskList[i]);
-      }
-    }
-    setTaskList(newTaskList);
+    const firstPart = taskList.slice(0, index);
+    const secondPart = taskList.slice(index + 1, taskList.length);
+    // const elementToUpdate = taskList[index]
+    // elementToUpdate.content = newContent;
+    // const newTaskList = [...firstPart, elementToUpdate, ...secondPart]
+    setTaskList(firstPart.concat(secondPart));
   }
   function handleSave(value, index) {
     taskList[index].content = value;
@@ -54,10 +55,40 @@ export default function Layout() {
     setRemainingFilter(false);
     setCompleteFilter(false);
   }
-
+  function handleSortAscending() {
+    setAscendingSort(true);
+    setDescendingSort(false);
+  }
+  function handleSortDescending() {
+    setDescendingSort(true);
+    setAscendingSort(false);
+  }
   let filteredTasks = taskList;
   // Derived state. Don't need to store it in state using useState.
-
+  if (ascendingSort) {
+    for (let i = 1; i < taskList.length; i++) {
+      for (let j = 0; j < i; j++) {
+        if (taskList[i].date_created > taskList[j].date_created) {
+          let x = taskList[i];
+          taskList[i] = taskList[j];
+          taskList[j] = x;
+        }
+      }
+    }
+    filteredTasks = taskList;
+  }
+  if (descendingSort) {
+    for (let i = 1; i < taskList.length; i++) {
+      for (let j = 0; j < i; j++) {
+        if (taskList[i].date_created < taskList[j].date_created) {
+          let x = taskList[i];
+          taskList[i] = taskList[j];
+          taskList[j] = x;
+        }
+      }
+    }
+    filteredTasks = taskList;
+  }
   if (completeFilter) {
     filteredTasks = [];
     for (let i = 0; i < taskList.length; i++) {
@@ -108,6 +139,27 @@ export default function Layout() {
         <div className="d-flex flex-column align-items-center border w-50 p-4 m-4 rounded main-content text-light">
           <AddTask onAddTask={handleAddTask} />
           <Search onSearch={handleSearch} />
+          <div className="d-flex justify-content-end mt-3 w-100 align-items-center">
+            <div className="me-1 text-light" style={{ fontWeight: "700" }}>
+              Date Created
+            </div>
+            <button
+              className="btn btn-secondary btn-sm me-1"
+              onClick={() => {
+                handleSortAscending();
+              }}
+            >
+              <i className="fa fa-arrow-up"></i>
+            </button>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                handleSortDescending();
+              }}
+            >
+              <i className="fa fa-arrow-down"></i>
+            </button>
+          </div>
           <div
             className="w-100 taskl-list mt-2"
             style={{ height: "50vh", overflowY: "scroll", overflowX: "hidden" }}

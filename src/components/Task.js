@@ -29,7 +29,6 @@ export default function TaskList(props) {
           type="checkbox"
           style={{ transform: "scale(1.5)" }}
           ref={checkRef}
-          id="check-box"
           onChange={() => {
             props.onStatusChange(
               checkRef.current.checked,

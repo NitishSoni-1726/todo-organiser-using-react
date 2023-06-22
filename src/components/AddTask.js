@@ -28,7 +28,6 @@ export default function AddTask(props) {
         <input
           type="text"
           className="w-100 rounded p-1 me-2 bg-transparent text-light border border-2"
-          id="add-task-input"
           ref={inputRef}
         ></input>
         <button className="btn btn-success" type="submit">

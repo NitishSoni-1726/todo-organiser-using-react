@@ -23,7 +23,7 @@ export default function TaskList(props) {
   }
 
   return (
-    <div className="align-self-start w-100 mt-3">
+    <div className="align-self-start w-100 mt-3" data-testid="task">
       <div className="d-flex align-items-center w-100">
         <input
           type="checkbox"
@@ -75,6 +75,7 @@ export default function TaskList(props) {
 
         <button
           className="btn btn-danger"
+          title="Delete"
           onClick={() => {
             props.onDelete(props.task.content);
           }}

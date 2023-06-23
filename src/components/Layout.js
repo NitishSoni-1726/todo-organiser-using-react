@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddTask from "./AddTask";
 import Task from "./Task";
 import Search from "./Search";
@@ -11,6 +11,21 @@ export default function Layout() {
   const [descendingSort, setDescendingSort] = useState(false);
   const [taskList, setTaskList] = useState([]);
 
+  useEffect(() => {
+    // TODO: Fetch todolist
+    async function fetchTodos() {
+      let response = await fetch("http://localhost:4000/api/todos");
+      let data = await response.text();
+      setTaskList(JSON.parse(data));
+    }
+    fetchTodos();
+  }, []);
+  function handlePostTodos(Todo) {
+    fetch(`http://localhost:4000/api/add-todo`, {
+      method: "POST",
+      body: JSON.stringify(Todo),
+    });
+  }
   function handleAddTask(newTaskContent) {
     let newTask = {
       content: newTaskContent,
@@ -18,13 +33,11 @@ export default function Layout() {
       date_created: new Date().getTime(),
     };
     setTaskList(taskList.concat(newTask));
+    handlePostTodos(newTask);
   }
   function handleDelete(index) {
     const firstPart = taskList.slice(0, index);
     const secondPart = taskList.slice(index + 1, taskList.length);
-    // const elementToUpdate = taskList[index]
-    // elementToUpdate.content = newContent;
-    // const newTaskList = [...firstPart, elementToUpdate, ...secondPart]
     setTaskList(firstPart.concat(secondPart));
   }
   function handleSave(value, index) {

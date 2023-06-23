@@ -26,6 +26,12 @@ export default function Layout() {
       body: JSON.stringify(Todo),
     });
   }
+  function handleDeleteTodos(index) {
+    // TODO: Read about query parameters
+    fetch(`http://localhost:4000/api/delete-todo?index=${index}`, {
+      method: "DELETE",
+    });
+  }
   function handleAddTask(newTaskContent) {
     let newTask = {
       content: newTaskContent,
@@ -39,6 +45,7 @@ export default function Layout() {
     const firstPart = taskList.slice(0, index);
     const secondPart = taskList.slice(index + 1, taskList.length);
     setTaskList(firstPart.concat(secondPart));
+    handleDeleteTodos(index);
   }
   function handleSave(value, index) {
     taskList[index].content = value;

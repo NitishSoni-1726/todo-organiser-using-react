@@ -1,7 +1,7 @@
 import http from "http";
 let port = 4000;
 let hostname = "127.0.0.1";
-const todos = [
+let todos = [
   {
     content: "First Fetched Todo",
     status: "not_completed",
@@ -28,6 +28,12 @@ const todos = [
     date_created: 1687496696947,
   },
 ];
+function handleOption(res) {
+  res.statusCode = 200;
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
+  res.end();
+}
 function handleServerStart(res) {
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/plain");
@@ -39,7 +45,47 @@ function handleTodosGet(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.end(JSON.stringify(todos));
 }
-function handleTodosPost(res) {}
+function handleTodosPost(req, res) {
+  res.statusCode = 200;
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  let newTodo = "";
+  req.on("data", (chunk) => {
+    newTodo += chunk.toString();
+  });
+  req.on("end", () => {
+    todos.push(JSON.parse(newTodo));
+    res.end("Added");
+  });
+}
+
+function getQueryParams(url) {
+  const queryParamsStr = url.split("?");
+  const queryParams = queryParamsStr[1]
+    .split("&")
+    .map((keyValStr) => keyValStr.split("="))
+    .map(([key, val]) => ({ [key]: val }));
+
+  return queryParams.reduce((acc, qp) => ({ ...acc, ...qp }), {});
+}
+function DeleteTodo(index) {
+  let updatedTodos = [];
+  for (let i = 0; i < todos.length; i++) {
+    if (i === Number(index)) {
+    } else {
+      updatedTodos.push(todos[i]);
+    }
+  }
+  return updatedTodos;
+}
+function handleTodosDelete(res, req) {
+  const index = getQueryParams(req.url).index;
+  console.log(index);
+  res.statusCode = 200;
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "OPTIONS, DELETE");
+  todos = DeleteTodo(index);
+  res.end("Deleted");
+}
 function handlePageNotFound(res) {
   res.statusCode = 404;
   res.setHeader("Content-Type", "text/plain");
@@ -48,14 +94,20 @@ function handlePageNotFound(res) {
 }
 
 const server = http.createServer((req, res) => {
-  console.log("Got request", req.url);
+  console.log("Got request", req.url, req.method);
   if (req.url === "/") {
     handleServerStart(res);
   } else if (req.url === "/api/todos" && req.method === "GET") {
     handleTodosGet(res);
   } else if (req.url === "/api/add-todo" && req.method === "POST") {
-    // TODO
-    handleTodosPost(res);
+    handleTodosPost(req, res);
+  } else if (req.method === "OPTIONS") {
+    handleOption(res);
+  } else if (
+    req.url.startsWith("/api/delete-todo") &&
+    req.method === "DELETE"
+  ) {
+    handleTodosDelete(res, req);
   } else {
     handlePageNotFound(res);
   }

@@ -21,15 +21,28 @@ export default function Layout() {
     fetchTodos();
   }, []);
   function handlePostTodos(Todo) {
-    fetch(`http://localhost:4000/api/add-todo`, {
+    fetch(`http://localhost:4000/api/todos`, {
       method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(Todo),
     });
   }
   function handleDeleteTodos(index) {
     // TODO: Read about query parameters
-    fetch(`http://localhost:4000/api/delete-todo?index=${index}`, {
+    fetch(`http://localhost:4000/api/todos/${index}`, {
       method: "DELETE",
+    });
+  }
+  function handlePutTodos(array) {
+    fetch(`http://localhost:4000/api/todos`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(array),
     });
   }
   function handleAddTask(newTaskContent) {
@@ -49,6 +62,7 @@ export default function Layout() {
   }
   function handleSave(value, index) {
     taskList[index].content = value;
+    handlePutTodos(taskList);
     setTaskList([...taskList]);
   }
   function handleStatusChange(checked, index) {
@@ -57,6 +71,7 @@ export default function Layout() {
     } else {
       taskList[index].status = "not_completed";
     }
+    handlePutTodos(taskList);
     setTaskList([...taskList]);
   }
   function handleSearch(searchStr) {

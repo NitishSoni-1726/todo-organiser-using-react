@@ -5,15 +5,22 @@ import { MongoClient } from "mongodb";
 import mongoose from "mongoose";
 //connection to database
 const client = new MongoClient("mongodb://localhost:27017");
-const databaseTodos = client.db("doit").collection("todo");
 mongoose.connect("mongodb://localhost:27017/doit");
-//declaring database structure
+//declaring Todo database structure
 const todos = new mongoose.Schema({
   content: String,
   status: String,
   date_created: Number,
 });
 const todo = mongoose.model("todo", todos);
+//declaring User database structure
+const user = new mongoose.Schema({
+  FirstName: String,
+  LastName: String,
+  Email: String,
+  Password: String,
+});
+const Users = mongoose.model("users", user);
 //Connection
 client.connect().then(() => {
   console.log("Connected Successfully!");
@@ -78,6 +85,16 @@ async function handleUpdateTodos(req, res) {
     { content: req.body[0].content, status: req.body[0].status }
   );
   res.send("Updated");
+}
+
+//User Manager
+app.post("/api/user", (req, res) => {
+  handleUserPost(req, res);
+});
+function handleUserPost(req, res) {
+  let User = new Users(req.body);
+  User.save();
+  res.send("Added");
 }
 //Invalid Request
 app.get("*", (req, res) => {

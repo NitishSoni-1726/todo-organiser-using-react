@@ -169,11 +169,8 @@ export default function Layout() {
   }
 
   return (
-    <div>
-      <div className="w-100 text-center bg-dark text-light p-3">
-        <h1>To Do Organiser</h1>
-      </div>
-      <div className="d-flex justify-content-center bg-dark content">
+    <div className="w-100">
+      <div className="mt-4 d-flex justify-content-center bg-dark w-100">
         <div className="d-flex flex-column align-items-center border w-50 p-4 m-4 rounded main-content text-light">
           <AddTask onAddTask={handleAddTask} />
           <Search onSearch={handleSearch} />

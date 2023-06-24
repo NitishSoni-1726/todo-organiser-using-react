@@ -9,28 +9,22 @@ test.beforeEach(async ({ page }) => {
 
 test("To Do Addition Test", async ({ page }) => {
   page.get;
-  expect(await page.getByTestId("task").count()).toEqual(0);
-
+  const taskCount = await page.getByTestId("task").count();
   await page
     .locator('form[name="newtask"]')
     .getByRole("textbox")
-    .type("My First Task");
+    .type("Test Task 1");
   await page.getByRole("button", { name: "+" }).click();
-  expect(await page.getByTestId("task").count()).toEqual(1);
-  await page
-    .locator('form[name="newtask"]')
-    .getByRole("textbox")
-    .type("My Second Task");
-  await page.getByRole("button", { name: "+" }).click();
-  expect(await page.getByTestId("task").count()).toEqual(2);
+  expect(await page.getByTestId("task").count()).toEqual(taskCount + 1);
 });
 
 //test case to check Delete Button of the To Do App
 
 test("To Do Delete Test", async ({ page }) => {
   page.get;
+  const taskCount = await page.getByTestId("task").count();
   await page.getByRole("button", { name: "Delete" }).first().click();
-  expect(await page.getByTestId("task").count()).toEqual(1);
+  expect(await page.getByTestId("task").count()).toEqual(taskCount - 1);
 });
 
 //test case to check the Completed Task Filter Button

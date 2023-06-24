@@ -9,9 +9,9 @@ function App() {
     <div className="App">
       <Router>
         <NavBar />
-        <div className="content bg-dark">
+        <div className="content bg-dark border border-3">
           <Routes>
-            <Route path="" element={<Layout />}></Route>
+            <Route path="/" element={<Layout />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/register" element={<Register />}></Route>
           </Routes>

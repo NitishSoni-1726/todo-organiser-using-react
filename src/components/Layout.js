@@ -13,7 +13,7 @@ export default function Layout() {
 
   useEffect(() => {
     async function fetchTodos() {
-      let response = await fetch("http://localhost:4000/api/todos");
+      let response = await fetch("/api/todos");
       let data = await response.text();
       setTaskList(JSON.parse(data));
     }
@@ -21,7 +21,7 @@ export default function Layout() {
   }, []);
 
   function handlePostTodos(Todo) {
-    fetch(`http://localhost:4000/api/todos`, {
+    fetch(`/api/todos`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -31,7 +31,7 @@ export default function Layout() {
     });
   }
   function handleDeleteTodos(object) {
-    fetch("http://localhost:4000/api/todos", {
+    fetch("/api/todos", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export default function Layout() {
     });
   }
   function handlePutTodos(array) {
-    fetch(`http://localhost:4000/api/todos`, {
+    fetch(`/api/todos`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

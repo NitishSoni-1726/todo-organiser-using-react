@@ -12,6 +12,7 @@ export default function NavBar() {
         alignItems: "center",
         justifyContent: "space-between",
         border: "solid 2px white",
+        borderBottom: "none",
       }}
     >
       <Link

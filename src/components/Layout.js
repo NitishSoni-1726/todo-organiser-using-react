@@ -39,13 +39,13 @@ export default function Layout() {
       body: JSON.stringify(object),
     });
   }
-  function handlePutTodos(array) {
+  function handlePutTodos(object) {
     fetch(`/api/todos`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(array),
+      body: JSON.stringify(object),
     });
   }
   function handleAddTask(newTaskContent) {
@@ -65,7 +65,7 @@ export default function Layout() {
   }
   function handleSave(value, index) {
     taskList[index].content = value;
-    handlePutTodos(taskList);
+    handlePutTodos(taskList[index]);
     setTaskList([...taskList]);
   }
   function handleStatusChange(checked, index) {
@@ -74,7 +74,7 @@ export default function Layout() {
     } else {
       taskList[index].status = "not_completed";
     }
-    handlePutTodos(taskList);
+    handlePutTodos(taskList[index]);
     setTaskList([...taskList]);
   }
   function handleSearch(searchStr) {
@@ -101,27 +101,48 @@ export default function Layout() {
     setDescendingSort(true);
     setAscendingSort(false);
   }
+  function ConvertDate(miliseconds) {
+    let year = new Date(miliseconds).getFullYear();
+    let month = (new Date(miliseconds).getMonth() + 1)
+      .toString()
+      .padStart(2, "0");
+    let day = new Date(miliseconds).getDate().toString().padStart(2, "0");
+    let date = year + "-" + month + "-" + day;
+    return date;
+  }
+  function handleDateFilter(event) {
+    filteredTasks = [];
+    if (event.target.value === "") {
+      filteredTasks = taskList;
+    } else {
+      for (let i = 0; i < taskList.length; i++) {
+        if (event.target.value === ConvertDate(taskList[i].date_created)) {
+          filteredTasks.push(taskList[i]);
+        }
+      }
+    }
+  }
   let filteredTasks = taskList;
   // Derived state. Don't need to store it in state using useState.
   if (ascendingSort) {
-    for (let i = 1; i < taskList.length; i++) {
+    for (let i = 1; i < filteredTasks.length; i++) {
       for (let j = 0; j < i; j++) {
-        if (taskList[i].date_created > taskList[j].date_created) {
-          let x = taskList[i];
-          taskList[i] = taskList[j];
-          taskList[j] = x;
+        if (filteredTasks[i].date_created > filteredTasks[j].date_created) {
+          let x = filteredTasks[i];
+          filteredTasks[i] = filteredTasks[j];
+          filteredTasks[j] = x;
         }
       }
     }
     filteredTasks = taskList;
   }
   if (descendingSort) {
-    for (let i = 1; i < taskList.length; i++) {
+    for (let i = 1; i < filteredTasks.length; i++) {
       for (let j = 0; j < i; j++) {
-        if (taskList[i].date_created < taskList[j].date_created) {
-          let x = taskList[i];
-          taskList[i] = taskList[j];
-          taskList[j] = x;
+        if (filteredTasks[i].date_created < filteredTasks[j].date_created) {
+          let x = filteredTasks[i];
+          filteredTasks[i] = filteredTasks[j];
+          filteredTasks[j] = x;
         }
       }
     }
@@ -171,29 +192,38 @@ export default function Layout() {
   return (
     <div className="w-100">
       <div className="mt-4 d-flex justify-content-center bg-dark w-100">
-        <div className="d-flex flex-column align-items-center border w-50 p-4 m-4 rounded main-content text-light">
+        <div className="d-flex flex-column align-items-center border w-50 p-4 m-4 rounded main-content text-light bg-black bg-opacity-25">
           <AddTask onAddTask={handleAddTask} />
           <Search onSearch={handleSearch} />
-          <div className="d-flex justify-content-end mt-3 w-100 align-items-center">
-            <div className="me-1 text-light" style={{ fontWeight: "700" }}>
-              Date Created
+          <div className="d-flex justify-content-between mt-3 w-100 align-items-center">
+            <div>
+              <input
+                type="date"
+                className="bg-secondary rounded text-light bg-opacity-25 p-2 border border-2"
+                onChange={handleDateFilter}
+              ></input>
             </div>
-            <button
-              className="btn btn-secondary btn-sm me-1"
-              onClick={() => {
-                handleSortAscending();
-              }}
-            >
-              <i className="fa fa-arrow-up"></i>
-            </button>
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                handleSortDescending();
-              }}
-            >
-              <i className="fa fa-arrow-down"></i>
-            </button>
+            <div className="d-flex align-items-center">
+              <div className="me-1 text-light" style={{ fontWeight: "700" }}>
+                Date Created
+              </div>
+              <button
+                className="btn btn-secondary btn-sm me-1"
+                onClick={() => {
+                  handleSortAscending();
+                }}
+              >
+                <i className="fa fa-arrow-up"></i>
+              </button>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => {
+                  handleSortDescending();
+                }}
+              >
+                <i className="fa fa-arrow-down"></i>
+              </button>
+            </div>
           </div>
           <div
             className="w-100 taskl-list mt-2"

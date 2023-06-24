@@ -5,7 +5,7 @@ export default function Search(props) {
     <div className="w-100 mt-3">
       <input
         type="text"
-        className="w-100 bg-transparent border border-2 p-2 text-light"
+        className="w-100 bg-transparent border border-2 p-2 text-light rounded"
         placeholder="Type to Search..."
         onKeyUp={() => {
           if (searchRef.current) {

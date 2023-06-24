@@ -70,7 +70,7 @@ function handleTodosPost(req, res) {
 }
 //To Delete Todo from Database
 app.delete("/api/todos", (req, res) => {
-  console.log("Deleting a Task from MongoDB");
+  console.log("Deleting a Task at MongoDB");
   handleTodosDelete(res, req);
 });
 function handleTodosDelete(res, req) {
@@ -82,12 +82,13 @@ async function DeleteTodo(req, res) {
 }
 //To Update Todo from Database
 app.put("/api/todos", (req, res) => {
+  console.log("Updating a Task at MongoDB");
   handleUpdateTodos(req, res);
 });
 async function handleUpdateTodos(req, res) {
   await todo.findOneAndUpdate(
-    { date_created: req.body[0].date_created },
-    { content: req.body[0].content, status: req.body[0].status }
+    { date_created: req.body.date_created },
+    { content: req.body.content, status: req.body.status }
   );
   res.send("Updated");
 }

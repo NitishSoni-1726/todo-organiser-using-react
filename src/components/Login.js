@@ -30,9 +30,11 @@ export default function Login() {
         className="border d-flex flex-column align-items-center p-4 bg-secondary bg-opacity-25"
         style={{ width: "35%" }}
       >
-        <h1 className="text-light" style={{ fontFamily: "monospace" }}>
-          <span className="text-success">Login </span>
-          <span className="text-danger">Form</span>
+        <h1
+          className="text-danger"
+          style={{ fontFamily: "monospace", textDecoration: "underline" }}
+        >
+          Login Form
         </h1>
         <form
           className="w-100 d-flex flex-column align-items-center mt-4 mb-4"

@@ -64,11 +64,10 @@ export default function Register() {
         ) : (
           <div className="w-100">
             <h1
-              className="text-light text-center"
-              style={{ fontFamily: "monospace" }}
+              className="text-success text-center"
+              style={{ fontFamily: "monospace", textDecoration: "underline" }}
             >
-              <span className="text-success">Registration </span>
-              <span className="text-danger">Form</span>
+              Registration Form
             </h1>
             <form
               className="d-flex flex-column w-100 justify-content-center align-items-center"

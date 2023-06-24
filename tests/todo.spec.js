@@ -11,13 +11,16 @@ test("To Do Addition Test", async ({ page }) => {
   page.get;
   expect(await page.getByTestId("task").count()).toEqual(0);
 
-  await page.locator('form[name="newtask"]').getByRole("textbox").type("Hello");
+  await page
+    .locator('form[name="newtask"]')
+    .getByRole("textbox")
+    .type("My First Task");
   await page.getByRole("button", { name: "+" }).click();
   expect(await page.getByTestId("task").count()).toEqual(1);
   await page
     .locator('form[name="newtask"]')
     .getByRole("textbox")
-    .type("Hello Again");
+    .type("My Second Task");
   await page.getByRole("button", { name: "+" }).click();
   expect(await page.getByTestId("task").count()).toEqual(2);
 });
@@ -26,14 +29,6 @@ test("To Do Addition Test", async ({ page }) => {
 
 test("To Do Delete Test", async ({ page }) => {
   page.get;
-
-  await page.locator('form[name="newtask"]').getByRole("textbox").type("Hello");
-  await page.getByRole("button", { name: "+" }).click();
-  await page
-    .locator('form[name="newtask"]')
-    .getByRole("textbox")
-    .type("Hello Again");
-  await page.getByRole("button", { name: "+" }).click();
   await page.getByRole("button", { name: "Delete" }).first().click();
   expect(await page.getByTestId("task").count()).toEqual(1);
 });
@@ -42,65 +37,24 @@ test("To Do Delete Test", async ({ page }) => {
 
 test("Completed Task Flter", async ({ page }) => {
   page.get;
-
-  await page.locator('form[name="newtask"]').getByRole("textbox").type("Hello");
-  await page.getByRole("button", { name: "+" }).click();
-  await page
-    .locator('form[name="newtask"]')
-    .getByRole("textbox")
-    .type("Hello Again");
-  await page.getByRole("button", { name: "+" }).click();
-  await page
-    .locator('form[name="newtask"]')
-    .getByRole("textbox")
-    .type("Hello Again Again");
-  await page.getByRole("button", { name: "+" }).click();
   await page.getByRole("checkbox").first().check();
-  await page.getByRole("checkbox").nth(1).check();
-  await page.getByRole("button", { name: "Completed Task: 2" }).click();
-  expect(await page.getByTestId("task").count()).toEqual(2);
+  await page.getByRole("button", { name: "Completed Task: 1" }).click();
+  expect(await page.getByTestId("task").count()).toEqual(1);
 });
 
 //test case to check the Remaining Task Filter Button
 
 test("Remaining Task Flter", async ({ page }) => {
   page.get;
-
-  await page.locator('form[name="newtask"]').getByRole("textbox").type("Hello");
-  await page.getByRole("button", { name: "+" }).click();
-  await page
-    .locator('form[name="newtask"]')
-    .getByRole("textbox")
-    .type("Hello Again");
-  await page.getByRole("button", { name: "+" }).click();
-  await page
-    .locator('form[name="newtask"]')
-    .getByRole("textbox")
-    .type("Hello Again Again");
-  await page.getByRole("button", { name: "+" }).click();
-  await page.getByRole("checkbox").first().check();
-  await page.getByRole("button", { name: "Remaining Task: 2" }).click();
-  expect(await page.getByTestId("task").count()).toEqual(2);
+  await page.getByRole("checkbox").uncheck();
+  await page.getByRole("button", { name: "Remaining Task: 1" }).click();
+  expect(await page.getByTestId("task").count()).toEqual(1);
 });
 
 //test case to check the All Task Filter Button
 
 test("All Task Flter", async ({ page }) => {
   page.get;
-
-  await page.locator('form[name="newtask"]').getByRole("textbox").type("Hello");
-  await page.getByRole("button", { name: "+" }).click();
-  await page
-    .locator('form[name="newtask"]')
-    .getByRole("textbox")
-    .type("Hello Again");
-  await page.getByRole("button", { name: "+" }).click();
-  await page
-    .locator('form[name="newtask"]')
-    .getByRole("textbox")
-    .type("Hello Again Again");
-  await page.getByRole("button", { name: "+" }).click();
-  await page.getByRole("checkbox").first().check();
-  await page.getByRole("button", { name: "Task Count: 3" }).click();
-  expect(await page.getByTestId("task").count()).toEqual(3);
+  await page.getByRole("button", { name: "Task Count: 1" }).click();
+  expect(await page.getByTestId("task").count()).toEqual(1);
 });

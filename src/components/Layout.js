@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AddTask from "./AddTask";
-import Task from "./Task";
 import Search from "./Search";
+import TaskList from "./TaskList";
 
 export default function Layout() {
   const [searchStr, setSearchStr] = useState("");
@@ -12,7 +12,6 @@ export default function Layout() {
   const [taskList, setTaskList] = useState([]);
 
   useEffect(() => {
-    // TODO: Fetch todolist
     async function fetchTodos() {
       let response = await fetch("http://localhost:4000/api/todos");
       let data = await response.text();
@@ -20,6 +19,7 @@ export default function Layout() {
     }
     fetchTodos();
   }, []);
+
   function handlePostTodos(Todo) {
     fetch(`http://localhost:4000/api/todos`, {
       method: "POST",
@@ -30,10 +30,13 @@ export default function Layout() {
       body: JSON.stringify(Todo),
     });
   }
-  function handleDeleteTodos(index) {
-    // TODO: Read about query parameters
-    fetch(`http://localhost:4000/api/todos/${index}`, {
+  function handleDeleteTodos(object) {
+    fetch("http://localhost:4000/api/todos", {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(object),
     });
   }
   function handlePutTodos(array) {
@@ -58,7 +61,7 @@ export default function Layout() {
     const firstPart = taskList.slice(0, index);
     const secondPart = taskList.slice(index + 1, taskList.length);
     setTaskList(firstPart.concat(secondPart));
-    handleDeleteTodos(index);
+    handleDeleteTodos(taskList.slice(index, index + 1));
   }
   function handleSave(value, index) {
     taskList[index].content = value;
@@ -199,19 +202,15 @@ export default function Layout() {
             className="w-100 taskl-list mt-2"
             style={{ height: "50vh", overflowY: "scroll", overflowX: "hidden" }}
           >
-            {filteredTasks.map((task, i) => {
-              return (
-                <Task
-                  key={task.content}
-                  index={i}
-                  task={task}
-                  onDelete={() => handleDelete(i)}
-                  onSave={handleSave}
-                  onStatusChange={handleStatusChange}
-                  onSaveClick={handleSave}
-                />
-              );
-            })}
+            <TaskList
+              task={filteredTasks}
+              onDelete={(i) => {
+                handleDelete(i);
+              }}
+              onSave={handleSave}
+              onStatusChange={handleStatusChange}
+              onSaveClick={handleSave}
+            />
           </div>
           <div className="mt-3 d-flex justify-content-between w-100">
             <button

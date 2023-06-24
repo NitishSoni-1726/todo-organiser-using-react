@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-export default function TaskList(props) {
+export default function Task(props) {
   const checkRef = React.createRef();
   const taskRef = React.createRef();
   const saveButtonRef = React.createRef();

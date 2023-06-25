@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 export default function Login() {
   const { register, handleSubmit } = useForm();
   const [loginError, setLoginError] = useState(null);
-  async function checkUser(data) {
-    let response = await fetch("/api/checkUser", {
+  async function authenticate(data) {
+    let response = await fetch("/api/authenticate", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -22,7 +22,7 @@ export default function Login() {
     console.log(response);
   }
   const onSubmit = (data) => {
-    checkUser(data);
+    authenticate(data);
   };
   return (
     <div className="w-100 d-flex flex-column align-items-center">

@@ -16,8 +16,12 @@ export default function Layout() {
   useEffect(() => {
     async function fetchTodos() {
       let response = await fetch("/api/todos");
-      let data = await response.text();
-      setTaskList(JSON.parse(data));
+      let data = await response.json();
+      if (data.error === undefined) {
+        setTaskList(data);
+      } else {
+        window.location.href = "/login";
+      }
     }
     fetchTodos();
   }, []);

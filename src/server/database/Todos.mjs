@@ -1,6 +1,7 @@
 import { Todo } from "./DatabaseSetup.mjs";
 
 export async function handleTodosGet(req, res) {
+  const userId = req.session.user_id;
   const retrivedTodos = await Todo.find({ user_id: userId });
   res.json(retrivedTodos);
 }

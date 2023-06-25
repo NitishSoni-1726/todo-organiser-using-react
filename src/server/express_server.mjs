@@ -13,6 +13,7 @@ import {
 import { handleLogin, handleRegister } from "./database/Users.mjs";
 
 //Express Server
+
 const app = express();
 const port = 4000;
 const __filename = fileURLToPath(import.meta.url);

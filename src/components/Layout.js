@@ -5,8 +5,10 @@ import TaskList from "./TaskList";
 
 export default function Layout() {
   const [searchStr, setSearchStr] = useState("");
+  const [dateStr, setDateStr] = useState("");
   const [completeFilter, setCompleteFilter] = useState(false);
   const [remainingFilter, setRemainingFilter] = useState(false);
+  const [dateFilter, setDateFilter] = useState(false);
   const [ascendingSort, setAscendingSort] = useState(false);
   const [descendingSort, setDescendingSort] = useState(false);
   const [taskList, setTaskList] = useState([]);
@@ -111,16 +113,8 @@ export default function Layout() {
     return date;
   }
   function handleDateFilter(event) {
-    filteredTasks = [];
-    if (event.target.value === "") {
-      filteredTasks = taskList;
-    } else {
-      for (let i = 0; i < taskList.length; i++) {
-        if (event.target.value === ConvertDate(taskList[i].date_created)) {
-          filteredTasks.push(taskList[i]);
-        }
-      }
-    }
+    setDateFilter(true);
+    setDateStr(event.target.value);
   }
   let filteredTasks = taskList;
   // Derived state. Don't need to store it in state using useState.
@@ -147,6 +141,18 @@ export default function Layout() {
       }
     }
     filteredTasks = taskList;
+  }
+  if (dateFilter) {
+    filteredTasks = [];
+    if (dateStr === "") {
+      filteredTasks = taskList;
+    } else {
+      for (let i = 0; i < taskList.length; i++) {
+        if (dateStr === ConvertDate(taskList[i].date_created)) {
+          filteredTasks.push(taskList[i]);
+        }
+      }
+    }
   }
   if (completeFilter) {
     filteredTasks = [];

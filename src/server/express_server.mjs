@@ -2,35 +2,30 @@ import express from "express";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
 import bodyParser from "body-parser";
-import cors from "cors";
-import { MongoClient } from "mongodb";
-import mongoose from "mongoose";
-import crypto from "crypto";
-//connection to database
-const client = new MongoClient("mongodb://localhost:27017");
-mongoose.connect("mongodb://localhost:27017/doit");
-//declaring Todo database structure
-const todos = new mongoose.Schema({
-  content: String,
-  status: String,
-  date_created: Number,
-});
-const todo = mongoose.model("todo", todos);
-//declaring User database structure
-const user = new mongoose.Schema({
-  FirstName: String,
-  LastName: String,
-  Email: String,
-  Password: String,
-});
-const Users = mongoose.model("users", user);
-//Connection
-client.connect().then(() => {
-  console.log("Connected Successfully!");
-});
+import { databaseInit } from "./database/DatabaseSetup.mjs";
+import {
+  handleTodosDelete,
+  handleTodosGet,
+  handleTodosPost,
+  handleUpdateTodos,
+} from "./database/Todos.mjs";
+import { handleLogin, handleRegister } from "./database/Users.mjs";
+
 //Express Server
 const app = express();
 const port = 4000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+//Database Connection
+databaseInit()
+  .then(() => {
+    console.log("Connected Successfully!");
+  })
+  .catch((e) => {
+    console.log("Error connecting to database", e);
+    process.exit(1);
+  });
+
 //use this before every request
 app.use(bodyParser.json());
 app.use(
@@ -38,100 +33,43 @@ app.use(
     extended: true,
   })
 );
-// app.use(cors());
+app.use(express.static(path.resolve(__dirname, "../../build")));
 //Express Server Listening To  http://localhost:4000
 app.listen(port, () => {
   console.log("Server Started");
 });
 
-//To Display Todos of Database
+//Todo Manager
+//End Point To Display Todo
 app.get("/api/todos", (req, res) => {
   console.log("Fetching DOIT Database from Mongo DB");
   handleTodosGet(res);
 });
-async function handleTodosGet(res) {
-  const retrivedTodos = await todo.find();
-  res.send(retrivedTodos);
-}
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-app.use(express.static(path.resolve(__dirname, "../../build")));
-//To Add Todo To DataBase
+//End Point To Add Todo
 app.post("/api/todos", (req, res) => {
   console.log("Adding a New Task to MongoDB");
   handleTodosPost(req, res);
 });
-function handleTodosPost(req, res) {
-  let Todo = new todo(req.body);
-  Todo.save();
-  res.send("Added");
-}
-//To Delete Todo from Database
+//End Point To Delete Todo
 app.delete("/api/todos", (req, res) => {
   console.log("Deleting a Task at MongoDB");
   handleTodosDelete(res, req);
 });
-function handleTodosDelete(res, req) {
-  DeleteTodo(req, res);
-}
-async function DeleteTodo(req, res) {
-  await todo.findOneAndRemove(req.body[0]);
-  res.send("Deleted");
-}
-//To Update Todo from Database
+//End Point To Update Todo from Database
 app.put("/api/todos", (req, res) => {
   console.log("Updating a Task at MongoDB");
   handleUpdateTodos(req, res);
 });
-async function handleUpdateTodos(req, res) {
-  await todo.findOneAndUpdate(
-    { date_created: req.body.date_created },
-    { content: req.body.content, status: req.body.status }
-  );
-  res.send("Updated");
-}
 
 //User Manager
-//To add new User
+//End Point To add New User
 app.post("/api/user", (req, res) => {
-  handleUserPost(req, res);
+  handleRegister(req, res);
 });
-async function handleUserPost(req, res) {
-  const userList = await Users.findOne({ Email: req.body.Email });
-  if (userList === null) {
-    req.body.Password = crypto
-      .createHash("md5")
-      .update(req.body.Password)
-      .digest("hex");
-    let User = new Users(req.body);
-    User.save();
-    res.json({ status: "success" });
-  } else {
-    res.json({ error: "User Already Registered" });
-  }
-}
 //To Check User
 app.post("/api/checkUser", (req, res) => {
-  handleCheckUser(req, res);
+  handleLogin(req, res);
 });
-async function handleCheckUser(req, res) {
-  const userList = await Users.findOne({ Email: req.body.Email });
-  const Password = crypto
-    .createHash("md5")
-    .update(req.body.Password)
-    .digest("hex");
-  if (userList === null) {
-    res.json({ error: "User Not Found" });
-  } else {
-    if (userList.Email === req.body.Email && userList.Password === Password) {
-      res.json({ status: "success" });
-    } else {
-      res.json({ error: "Invalid Password" });
-    }
-  }
-}
 //Welcome Page
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../../build", "index.html"));

@@ -28,14 +28,15 @@ export async function handleLogin(req, res) {
     if (userList.Email === req.body.Email && userList.Password === Password) {
       let createDate = new Date().getTime();
       let expireDate = createDate + 259200000;
-      let userEmail = req.body.Email;
+      let userId = userList._id;
       let sessionObject = {
-        user_email: userEmail,
+        user_id: userId,
         expire_time: expireDate,
         create_time: createDate,
       };
       let session = new Session(sessionObject);
       session.save();
+      res.cookie("user_session", JSON.stringify(session));
       res.json({ status: "success" });
     } else {
       res.json({ error: "Invalid Password" });

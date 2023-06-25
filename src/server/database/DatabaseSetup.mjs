@@ -8,6 +8,7 @@ export async function databaseInit() {
 }
 //declaring Todo database structure
 const todos = new mongoose.Schema({
+  user_id: String,
   content: String,
   status: String,
   date_created: Number,
@@ -23,7 +24,7 @@ const user = new mongoose.Schema({
 export const Users = mongoose.model("users", user);
 //declaring Session database structure
 const session = new mongoose.Schema({
-  user_email: String,
+  user_id: String,
   expire_time: Number,
   create_time: Number,
 });

@@ -2,7 +2,8 @@ import express from "express";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
 import bodyParser from "body-parser";
-import { databaseInit } from "./database/DatabaseSetup.mjs";
+import { databaseInit, Session } from "./database/DatabaseSetup.mjs";
+import cookieParser from "cookie-parser";
 import {
   handleTodosDelete,
   handleTodosGet,
@@ -33,7 +34,9 @@ app.use(
     extended: true,
   })
 );
+
 app.use(express.static(path.resolve(__dirname, "../../build")));
+app.use(cookieParser());
 //Express Server Listening To  http://localhost:4000
 app.listen(port, () => {
   console.log("Server Started");
@@ -43,7 +46,7 @@ app.listen(port, () => {
 //End Point To Display Todo
 app.get("/api/todos", (req, res) => {
   console.log("Fetching DOIT Database from Mongo DB");
-  handleTodosGet(res);
+  handleTodosGet(req, res);
 });
 //End Point To Add Todo
 app.post("/api/todos", (req, res) => {

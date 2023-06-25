@@ -4,6 +4,8 @@ import path, { dirname } from "path";
 import bodyParser from "body-parser";
 import { databaseInit, Session } from "./database/DatabaseSetup.mjs";
 import cookieParser from "cookie-parser";
+import "dotenv/config";
+
 import {
   handleTodosDelete,
   handleTodosGet,

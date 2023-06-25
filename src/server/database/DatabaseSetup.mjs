@@ -1,10 +1,15 @@
 import { MongoClient } from "mongodb";
 import mongoose from "mongoose";
+
 //Initialize Database
 export async function databaseInit() {
-  const client = new MongoClient("mongodb://localhost:27017");
-  mongoose.connect("mongodb://localhost:27017/doit");
-  return client.connect();
+  if (process.env.MONGO_URI) {
+    const client = new MongoClient(process.env.MONGO_URI);
+    const connn = mongoose.connect(process.env.MONGO_URI);
+    return client.connect();
+  } else {
+    throw new Error("MONGO_URI environement variable not set. Please set it.");
+  }
 }
 //declaring Todo database structure
 const todos = new mongoose.Schema({

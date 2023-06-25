@@ -15,6 +15,17 @@ export async function handleRegister(req, res) {
     res.json({ error: "User Already Registered" });
   }
 }
+function CreateSession(userList) {
+  let createDate = new Date().getTime();
+  let expireDate = createDate + 259200000;
+  let userId = userList._id;
+  let sessionObject = {
+    user_id: userId,
+    expire_time: expireDate,
+    create_time: createDate,
+  };
+  return sessionObject;
+}
 
 export async function handleLogin(req, res) {
   const userList = await Users.findOne({ Email: req.body.Email });
@@ -26,15 +37,7 @@ export async function handleLogin(req, res) {
     res.json({ error: "User Not Found" });
   } else {
     if (userList.Email === req.body.Email && userList.Password === Password) {
-      let createDate = new Date().getTime();
-      let expireDate = createDate + 259200000;
-      let userId = userList._id;
-      let sessionObject = {
-        user_id: userId,
-        expire_time: expireDate,
-        create_time: createDate,
-      };
-      let session = new Session(sessionObject);
+      let session = new Session(CreateSession(userList));
       session.save();
       res.cookie("user_session", JSON.stringify(session));
       res.json({ status: "success" });

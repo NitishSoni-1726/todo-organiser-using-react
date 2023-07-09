@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import AddTask from "./AddTask";
 import Search from "./Search";
 import TaskList from "./TaskList";
+
+export const AppContext = createContext({});
 
 export default function Layout() {
   const [searchStr, setSearchStr] = useState("");
@@ -200,80 +202,85 @@ export default function Layout() {
   }
 
   return (
-    <div className="w-100">
-      <div className="mt-4 d-flex justify-content-center bg-dark w-100">
-        <div className="d-flex flex-column align-items-center border w-50 p-4 m-4 rounded main-content text-light bg-black bg-opacity-25">
-          <AddTask onAddTask={handleAddTask} />
-          <Search onSearch={handleSearch} />
-          <div className="d-flex justify-content-between mt-3 w-100 align-items-center">
-            <div>
-              <input
-                type="date"
-                className="bg-secondary rounded text-light bg-opacity-25 p-2 border border-2"
-                onChange={handleDateFilter}
-              ></input>
-            </div>
-            <div className="d-flex align-items-center">
-              <div className="me-1 text-light" style={{ fontWeight: "700" }}>
-                Date Created
+    <AppContext.Provider
+      value={{
+        todos: filteredTasks,
+        onSave: handleSave,
+        onDelete: handleDelete,
+        onStatusChange: handleStatusChange,
+      }}
+    >
+      <div className="w-100">
+        <div className="mt-4 d-flex justify-content-center bg-dark w-100">
+          <div className="d-flex flex-column align-items-center border w-50 p-4 m-4 rounded main-content text-light bg-black bg-opacity-25">
+            <AddTask onAddTask={handleAddTask} />
+            <Search onSearch={handleSearch} />
+            <div className="d-flex justify-content-between mt-3 w-100 align-items-center">
+              <div>
+                <input
+                  type="date"
+                  className="bg-secondary rounded text-light bg-opacity-25 p-2 border border-2"
+                  onChange={handleDateFilter}
+                ></input>
               </div>
+              <div className="d-flex align-items-center">
+                <div className="me-1 text-light" style={{ fontWeight: "700" }}>
+                  Date Created
+                </div>
+                <button
+                  className="btn btn-secondary btn-sm me-1"
+                  onClick={() => {
+                    handleSortAscending();
+                  }}
+                >
+                  <i className="fa fa-arrow-up"></i>
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    handleSortDescending();
+                  }}
+                >
+                  <i className="fa fa-arrow-down"></i>
+                </button>
+              </div>
+            </div>
+            <div
+              className="w-100 taskl-list mt-2"
+              style={{
+                height: "50vh",
+                overflowY: "scroll",
+                overflowX: "hidden",
+              }}
+            >
+              <TaskList tasks={filteredTasks} />
+            </div>
+            <div className="mt-3 d-flex justify-content-between w-100">
               <button
-                className="btn btn-secondary btn-sm me-1"
-                onClick={() => {
-                  handleSortAscending();
-                }}
+                className="btn btn-warning"
+                style={{ fontWeight: "700", fontSize: "14px" }}
+                onClick={handleShowAllTask}
               >
-                <i className="fa fa-arrow-up"></i>
+                Task Count: {taskCount}
               </button>
               <button
-                className="btn btn-secondary btn-sm"
-                onClick={() => {
-                  handleSortDescending();
-                }}
+                className="btn btn-success"
+                style={{ fontWeight: "700", fontSize: "14px" }}
+                onClick={handleFilterCompleted}
               >
-                <i className="fa fa-arrow-down"></i>
+                Completed Task: {completedTaskCount}
+              </button>
+              <button
+                className="btn btn-danger"
+                style={{ fontWeight: "700", fontSize: "14px" }}
+                onClick={handleFilterRemaining}
+              >
+                Remaining Task: {remainingTaskCount}
               </button>
             </div>
-          </div>
-          <div
-            className="w-100 taskl-list mt-2"
-            style={{ height: "50vh", overflowY: "scroll", overflowX: "hidden" }}
-          >
-            <TaskList
-              task={filteredTasks}
-              onDelete={(i) => {
-                handleDelete(i);
-              }}
-              onSave={handleSave}
-              onStatusChange={handleStatusChange}
-              onSaveClick={handleSave}
-            />
-          </div>
-          <div className="mt-3 d-flex justify-content-between w-100">
-            <button
-              className="btn btn-warning"
-              style={{ fontWeight: "700", fontSize: "14px" }}
-              onClick={handleShowAllTask}
-            >
-              Task Count: {taskCount}
-            </button>
-            <button
-              className="btn btn-success"
-              style={{ fontWeight: "700", fontSize: "14px" }}
-              onClick={handleFilterCompleted}
-            >
-              Completed Task: {completedTaskCount}
-            </button>
-            <button
-              className="btn btn-danger"
-              style={{ fontWeight: "700", fontSize: "14px" }}
-              onClick={handleFilterRemaining}
-            >
-              Remaining Task: {remainingTaskCount}
-            </button>
           </div>
         </div>
       </div>
-    </div>
+    </AppContext.Provider>
   );
 }
